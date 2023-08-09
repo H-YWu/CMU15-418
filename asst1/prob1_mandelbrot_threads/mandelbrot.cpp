@@ -115,6 +115,7 @@ typedef struct {
 //
 // Thread entrypoint.
 void* workerThreadStart(void* threadArgs) {
+    double startTime = CycleTimer::currentSeconds();
 
     WorkerArgs* args = static_cast<WorkerArgs*>(threadArgs);
 
@@ -137,6 +138,8 @@ void* workerThreadStart(void* threadArgs) {
         }
     }
 
+    double endTime = CycleTimer::currentSeconds();
+    printf("[workThreadStart #%d]:\t\t[%.3f] ms\n", args->threadId, (endTime - startTime) * 1000);
     return NULL;
 }
 
@@ -151,7 +154,7 @@ void mandelbrotThread(
 		      int width, int height,
 		      int maxIterations, int output[])
 {
-    const static int MAX_THREADS = 32;
+    const static int MAX_THREADS = 128;
 
     if (numThreads > MAX_THREADS)
 	{
@@ -178,11 +181,6 @@ void mandelbrotThread(
         args[i].x1 = x1;
         args[i].y0 = y0;
         args[i].y1 = y1;
-        // args[i].y0 = y;
-        // if (i < m) args[i].height = dh + m;
-        // else args[i].height = dh;
-        // args[i].y1 = y + args[i].height;
-        // y = args[i].y1;
     }
 
     // Fire up the worker threads.  Note that numThreads-1 pthreads

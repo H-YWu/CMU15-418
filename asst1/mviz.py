@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 # Visualize images of Mandelbrot set
 
@@ -74,15 +74,16 @@ class MandelImage:
         self.help()
 
     def help(self):
-        print "Keyboard commands:"
-        print " + Zoom in"
-        print " - Zoom out"
-        print " l Shift left"
-        print " r Shift right"
-        print " u Shift up"
-        print " d Shift down"
-        print " h Return to original image"
-        print " q Quit"
+        # print "Keyboard commands:"
+        # print " + Zoom in"
+        # print " - Zoom out"
+        # print " l Shift left"
+        # print " r Shift right"
+        # print " u Shift up"
+        # print " d Shift down"
+        # print " h Return to original image"
+        # print " q Quit"
+        pass
 
 
     def displayImage(self, image):
@@ -105,7 +106,7 @@ class MandelImage:
         dt = datetime.datetime.now() - start
         tpi = dt/ntimes
         msecs = tpi.seconds/1000.0 + 1e-3*tpi.microseconds
-        print "%.2f ms/image" % msecs
+        #print "%.2f ms/image" % msecs
 
     def getImage(self):
         # Tell generator what we want:
@@ -115,12 +116,12 @@ class MandelImage:
             p = subprocess.Popen(clist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdoutData, stderrData) = p.communicate()
         except Exception as ex:
-            print "Couldn't run command '%s' (%s)" % (" ".join(clist), ex)
+            #print "Couldn't run command '%s' (%s)" % (" ".join(clist), ex)
             return None
         try:
             im = Image.open(self.imageFile)
         except Exception as ex:
-            print "Couldn't open image file '%s' (%s)" % (self.imageFile, ex)
+            #print "Couldn't open image file '%s' (%s)" % (self.imageFile, ex)
             return None
         return im
         
@@ -221,7 +222,8 @@ class MandelImage:
             elif cmd == 'h':
                 self.home()
             else:
-                print "Unknown command '%s'" % cmd
+                #print "Unknown command '%s'" % cmd
+                pass
         sys.exit(0)
 
 def run(name, args):
