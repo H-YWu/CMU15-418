@@ -83,7 +83,50 @@ void clampedExpSerial(float* values, int* exponents, float* output, int N) {
 
 void clampedExpVector(float* values, int* exponents, float* output, int N) {
     // TODO: Implement your vectorized version of clampedExpSerial here
-    //  ...
+    __cmu418_vec_float x;
+    __cmu418_vec_int y;
+    __cmu418_vec_float result;
+    __cmu418_vec_int one = _cmu418_vset_int(1);
+    __cmu418_vec_int zero = _cmu418_vset_int(0);
+    __cmu418_vec_float _418 = _cmu418_vset_float(4.18f);
+    __cmu418_mask maskNumber, maskIsPositive, maskIsOdd, maskIsOddInv, maskGt418;
+    for (int i=0; i<N; i+=VECTOR_WIDTH) {
+		// Valid array positions
+		maskNumber = _cmu418_init_ones(min(N-i, VECTOR_WIDTH));
+		maskIsPositive = _cmu418_init_ones(0);
+		// Load vector of values from contiguous memory addresses
+		x = _cmu418_vset_float(0.0f);
+		y = _cmu418_vset_int(0);
+		result = _cmu418_vset_float(0);
+		_cmu418_vload_float(x, values+i, maskNumber);               // x = values[i];
+		_cmu418_vload_int(y, exponents+i, maskNumber);              // y = exponents[i];
+		_cmu418_vset_float(result, 1.0f, maskNumber);				// result = 1.0f
+	
+		_cmu418_vgt_int(maskIsPositive, y, zero, maskNumber);	// y > 0
+		while (_cmu418_cntbits(maskIsPositive) > 0) {				// while ([exists]y > 0) {
+			// if (y & 0x1) {
+			__cmu418_vec_int odd = _cmu418_vset_int(0);
+			_cmu418_vbitand_int(odd, y, one, maskIsPositive);
+			maskIsOddInv = _cmu418_init_ones(0);
+				// (y & 0x1) != 0
+			_cmu418_veq_int(maskIsOddInv, odd, zero, maskIsPositive);
+			maskIsOddInv = _cmu418_mask_not(maskIsOddInv);
+			maskIsOdd = _cmu418_mask_and(maskIsOddInv, maskIsPositive);
+			_cmu418_vmult_float(result, result, x, maskIsOdd);		// result *= xpower;
+			// if (result > 4.18f) {
+			maskGt418 = _cmu418_init_ones(0);
+			_cmu418_vgt_float(maskGt418, result, _418, maskIsOdd);
+			_cmu418_vset_float(result, 4.18f, maskGt418);	// result = 4.18f;
+			// "break": set y = 0 
+			_cmu418_vset_int(y, 0, maskGt418);	
+			_cmu418_vgt_int(maskIsPositive, y, zero, maskNumber);	// y > 0
+
+			_cmu418_vmult_float(x, x, x, maskIsPositive);		// xpower = xpower * xpower; 
+			_cmu418_vshiftright_int(y, y, one, maskIsPositive); // y >>= 1;
+		}
+		// Write results back to memory
+		_cmu418_vstore_float(output+i, result, maskNumber);
+	}
 }
 
 
