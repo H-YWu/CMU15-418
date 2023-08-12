@@ -1,0 +1,15 @@
+# Report
+
+CPU:
+13th Gen Intel(R) Core(TM) i9-13900HX 2.20 GHz, 24 Cores, 32 Logic Cores
+
+## Asst 1 (23) Prob 3
+
+### Part 1 ISPC Basics
+
+- The maximum speedup I expect is 16
+- However the actual speedup is around 3-4
+
+- Maybe that's due to the execute time is different at different position in mandel function.
+- Many "streams" have to wait for slower ones.
+- Beacuse of conditions, Not all ALUs do useful work!
